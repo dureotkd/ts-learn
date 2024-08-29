@@ -1,23 +1,23 @@
 // utils
-function $(selector) {
+function $(selector: string) {
   return document.querySelector(selector);
 }
-function getUnixTimestamp(date) {
+function getUnixTimestamp(date: string) {
   return new Date(date).getTime();
 }
 
 // DOM
 const confirmedTotal = $(".confirmed-total");
-const deathsTotal = $(".deaths");
-const recoveredTotal = $(".recovered");
+const deathsTotal = $(".deaths") as HTMLParagraphElement;
+const recoveredTotal = $(".recovered") as HTMLParagraphElement;
 const lastUpdatedTime = $(".last-updated-time");
-const rankList = $(".rank-list");
-const deathsList = $(".deaths-list");
-const recoveredList = $(".recovered-list");
+const rankList = $(".rank-list") as HTMLElement;
+const deathsList = $(".deaths-list") as HTMLElement;
+const recoveredList = $(".recovered-list") as HTMLUListElement;
 const deathSpinner = createSpinnerElement("deaths-spinner");
 const recoveredSpinner = createSpinnerElement("recovered-spinner");
 
-function createSpinnerElement(id) {
+function createSpinnerElement(id: string) {
   const wrapperDiv = document.createElement("div");
   wrapperDiv.setAttribute("id", id);
   wrapperDiv.setAttribute(
@@ -47,7 +47,7 @@ function fetchCovidSummary() {
  * @param {'spain' | 'switzerland'} countryCode 스페인과 스위스만 지원됩니다.
  * @returns
  */
-function fetchCountryInfo(countryCode, status) {
+function fetchCountryInfo(countryCode: string) {
   // params: confirmed, recovered, deaths
   const url = `https://ts-covid-api.vercel.app/api/country/${countryCode}`;
   return axios.get(url);
@@ -64,17 +64,15 @@ function initEvents() {
   rankList.addEventListener("click", handleListClick);
 }
 
-async function handleListClick(event) {
-  let selectedId;
-  if (
-    event.target instanceof HTMLParagraphElement ||
-    event.target instanceof HTMLSpanElement
-  ) {
-    selectedId = event.target.parentElement.id;
+async function handleListClick(event: Event): Promise<void> {
+  let selectedId: string = "";
+  if (event.target instanceof HTMLParagraphElement) {
+    selectedId = event.target.parentElement?.id || "";
   }
   if (event.target instanceof HTMLLIElement) {
     selectedId = event.target.id;
   }
+
   if (isDeathLoading) {
     return;
   }
@@ -94,10 +92,7 @@ async function handleListClick(event) {
   //   selectedId,
   //   'recovered',
   // );
-  const { data: confirmedResponse } = await fetchCountryInfo(
-    selectedId,
-    "confirmed"
-  );
+  const { data: confirmedResponse } = await fetchCountryInfo(selectedId);
   endLoadingAnimation();
   // NOTE: 코로나 종식으로 오픈 API 지원이 끝나서 death, recover 데이터는 지원되지 않습니다.
   // setDeathsList(deathResponse);
@@ -108,7 +103,12 @@ async function handleListClick(event) {
   isDeathLoading = false;
 }
 
-function setDeathsList(data) {
+interface Death<TCases = undefined, TDate = undefined> {
+  Cases: TCases;
+  Date: TDate;
+}
+
+function setDeathsList(data: Array<Death<string, string>>) {
   const sorted = data.sort(
     (a, b) => getUnixTimestamp(b.Date) - getUnixTimestamp(a.Date)
   );
@@ -127,21 +127,21 @@ function setDeathsList(data) {
 }
 
 function clearDeathList() {
-  deathsList.innerHTML = null;
+  deathsList.innerHTML = "";
 }
 
-function setTotalDeathsByCountry(data) {
+function setTotalDeathsByCountry(data: Array<Death<string>>) {
   deathsTotal.innerText = data[0].Cases;
 }
 
-function setRecoveredList(data) {
+function setRecoveredList(data: Array<Death<string, string>>) {
   const sorted = data.sort(
     (a, b) => getUnixTimestamp(b.Date) - getUnixTimestamp(a.Date)
   );
   sorted.forEach((value) => {
     const li = document.createElement("li");
     li.setAttribute("class", "list-item-b flex align-center");
-    const span = document.createElement("span");
+    const span = document.createElement("span") as HTMLSpanElement;
     span.textContent = value.Cases;
     span.setAttribute("class", "recovered");
     const p = document.createElement("p");
@@ -153,10 +153,10 @@ function setRecoveredList(data) {
 }
 
 function clearRecoveredList() {
-  recoveredList.innerHTML = null;
+  recoveredList.innerHTML = "";
 }
 
-function setTotalRecoveredByCountry(data) {
+function setTotalRecoveredByCountry(data: Array<Death<string>>) {
   recoveredTotal.innerText = data[0].Cases;
 }
 
@@ -170,7 +170,7 @@ function endLoadingAnimation() {
   recoveredList.removeChild(recoveredSpinner);
 }
 
-async function setupData() {
+async function setupData(): Promise<void> {
   const { data } = await fetchCovidSummary();
   setTotalConfirmedNumber(data);
   setTotalDeathsByWorld(data);
@@ -179,7 +179,9 @@ async function setupData() {
   setLastUpdatedTimestamp(data);
 }
 
-function renderChart(data, labels) {
+interface dataType {}
+
+function renderChart(data: dataType, labels: string[]) {
   var ctx = $("#lineChart").getContext("2d");
   new Chart(ctx, {
     type: "line",
@@ -198,7 +200,7 @@ function renderChart(data, labels) {
   });
 }
 
-function setChartData(data) {
+function setChartData(data: Array<Death<string, string>>) {
   const chartData = data.slice(-14).map((value) => value.Cases);
   const chartLabel = data
     .slice(-14)

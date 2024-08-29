@@ -1,8 +1,11 @@
 {
   "compilerOptions": {
     "allowJs": true, //
+    "strict": true,
+    "noImplicitAny": true,
     "target": "ES5", // 무슨 버전으로 저장할래
-    "outDir": "./dist" // 타입스크립트 파일 어디에 저장할거야?
+    "outDir": "./dist", // 타입스크립트 파일 어디에 저장할거야?
+    "lib": ["ES2015", "DOM"] // 'DOM' 라이브러리도 포함하여 브라우저 API를 사용할 수 있게 함
   },
   "include": ["./src/**/*"] // 어디 폴더를 타입스크립트 추론 할것인지
 }
