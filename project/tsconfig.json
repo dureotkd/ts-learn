@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "allowJs": true, //
+    "target": "ES5", // 무슨 버전으로 저장할래
+    "outDir": "./dist" // 타입스크립트 파일 어디에 저장할거야?
+  },
+  "include": ["./src/**/*"] // 어디 폴더를 타입스크립트 추론 할것인지
+}
