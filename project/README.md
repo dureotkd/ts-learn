@@ -2,9 +2,47 @@
 
 ### 환경 구성
 
-- npm 초기화 `yarn init -y`
+- `npm` 초기화 `yarn init -y`
 
 - 타입스크립트 라이브러리 설치 `yarn add --dev typescript`
+
+- `import` 사용시 `webpack` 설정과 `babel` 설치 필요 `yarn add --dev @babel/core @babel/preset-env @babel/preset-typescript`
+
+- `eslint` 설치 `yarn add --dev @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint prettier eslint-plugin-prettier`
+
+```js
+// .eslintrc.js
+module.exports = {
+  root: true,
+  env: {
+    browser: true,
+    node: true,
+  },
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+  ],
+  plugins: ["prettier", "@typescript-eslint"],
+  rules: {
+    "prettier/prettier": [
+      "error",
+      {
+        singleQuote: true,
+        semi: true,
+        useTabs: false,
+        tabWidth: 2,
+        printWidth: 80,
+        bracketSpacing: true,
+        arrowParens: "avoid",
+      },
+    ],
+  },
+  parserOptions: {
+    parser: "@typescript-eslint/parser",
+  },
+};
+```
 
 - `tsconfig.json` 작성
 
